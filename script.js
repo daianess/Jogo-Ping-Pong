@@ -2,7 +2,7 @@ const canvasElement = document.querySelector('canvas'),
   canvasContext = canvasElement.getContext('2d'),
   gapX = 10
 
-const lineWidth = 15
+const mouse = { x: 0, y: 0 }
 
 // Campo
 const field = {
@@ -29,26 +29,36 @@ const line = {
 // Raquete da esquerda
 const leftPaddle = {
   x: gapX,
-  y: 240,
+  y: field.h / 2,
   w: line.w,
   h: 100,
+  _move: function () {
+    this.y = mouse.y
+  },
   draw: function () {
     // Desenho da raquete esquerda
     canvasContext.fillStyle = '#ffffff'
     canvasContext.fillRect(this.x, this.y, this.w, this.h)
+
+    this._move()
   }
 }
 
 // Raquete da direita
 const rightPaddle = {
   x: field.w - line.w - gapX,
-  y: 240,
+  y: field.h / 2,
   w: line.w,
   h: 100,
+  _move: function () {
+    this.y = ball.y
+  },
   draw: function () {
     // Desenho da raquete direita
     canvasContext.fillStyle = '#ffffff'
-    canvasContext.fillRect(this.x, this.w, this.w, this.h)
+    canvasContext.fillRect(this.x, this.y, this.w, this.h)
+
+    this._move()
   }
 }
 
@@ -57,12 +67,20 @@ const ball = {
   x: 120,
   y: 240,
   r: 10,
+  speed: 5, // Velocidade da bola
+  _move: function () {
+    // Movimento da Bola
+    this.x += this.speed
+    this.y += this.speed
+  },
   draw: function () {
     // Desenho da bola
     canvasContext.fillStyle = '#ffffff'
     canvasContext.beginPath()
     canvasContext.arc(this.x, this.y, this.r, 0, 2 * Math.PI, false)
     canvasContext.fill()
+
+    this._move()
   }
 }
 
@@ -83,5 +101,30 @@ function draw() {
   ball.draw() // Desenho da bola
 }
 
+// Animação para tipos de navegadores
+window.animateFrame = (function () {
+  return (
+    window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    window.oRequestAnimationFrame ||
+    window.msRequestAnimationFrame ||
+    function (callback) {
+      return window.setTimeout(callback, 1000 / 60)
+    }
+  )
+})()
+
+// Animação
+function main() {
+  animateFrame(main)
+  draw()
+}
+
 setup()
-draw()
+main()
+
+canvasElement.addEventListener('mousemove', function (e) {
+  mouse.x = e.pageX
+  mouse.y = e.pageY
+})

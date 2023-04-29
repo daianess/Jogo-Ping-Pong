@@ -52,6 +52,20 @@ const rightPaddle = {
   }
 }
 
+// Bola
+const ball = {
+  x: 120,
+  y: 240,
+  r: 10,
+  draw: function () {
+    // Desenho da bola
+    canvasContext.fillStyle = '#ffffff'
+    canvasContext.beginPath()
+    canvasContext.arc(this.x, this.y, this.r, 0, 2 * Math.PI, false)
+    canvasContext.fill()
+  }
+}
+
 // Definir a dimensão dos elementos da tela
 function setup() {
   canvasElement.width = canvasContext.width = window.innerWidth
@@ -66,11 +80,7 @@ function draw() {
   leftPaddle.draw() // Raquete esquerda
   rightPaddle.draw() // Raquete direita
 
-  // Bolinha
-  canvasContext.fillStyle = '#ffffff'
-  canvasContext.beginPath()
-  canvasContext.arc(120, 240, 10, 0, 2 * Math.PI, false)
-  canvasContext.fill()
+  ball.draw() // Desenho da bola
 }
 
 setup()

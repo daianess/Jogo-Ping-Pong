@@ -64,14 +64,49 @@ const rightPaddle = {
 
 // Bola
 const ball = {
-  x: 120,
-  y: 240,
-  r: 10,
+  x: field.w / 2,
+  y: field.h / 2,
+  r: 15,
   speed: 5, // Velocidade da bola
+  directionX: 1,
+  directionY: 1,
+  // Direção da bola
+  _calcPosition: function () {
+    // Verifica se o jogador 1 (humano) fez um ponto
+    if (this.x > field.w - this.r - rightPaddle.w - gapX) {
+      // Calcula a posição da raquete no eixo y
+      if (
+        this.y + this.r > rightPaddle.y && 
+        this.y - this.r < rightPaddle.y + rightPaddle.h
+        ) {
+        // Rebater a bola
+        this._reverseX()
+      } else {
+        // Fazer ponto
+      }
+    }
+
+    // Verifica se o jogador 2 (computador) fez um ponto
+    
+
+    // Calcula a posição vertical da bola (eixo Y)
+    if (
+      this.y - this.r < 0 ||
+      (this.y > field.h - this.r && this.directionY > 0)
+    ) {
+      this._reverseY()
+    }
+  },
+  _reverseX: function () {
+    this.directionX *= -1
+  },
+  _reverseY: function () {
+    this.directionY *= -1
+  },
   _move: function () {
     // Movimento da Bola
-    this.x += this.speed
-    this.y += this.speed
+    this.x += this.directionX * this.speed
+    this.y += this.directionY * this.speed
   },
   draw: function () {
     // Desenho da bola
@@ -79,7 +114,7 @@ const ball = {
     canvasContext.beginPath()
     canvasContext.arc(this.x, this.y, this.r, 0, 2 * Math.PI, false)
     canvasContext.fill()
-
+    this._calcPosition()
     this._move()
   }
 }

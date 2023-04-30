@@ -26,6 +26,26 @@ const line = {
   }
 }
 
+// Pontuação
+const score = {
+  human: 0,
+  computer: 0,
+  increaseHuman: function () {
+    this.human++
+  },
+  increaseComputer: function () {
+    this.computer++
+  },
+  draw: function() {
+    canvasContext.font = "bold 72px Arial"
+    canvasContext.textAlign = "center"
+    canvasContext.textBaseline = "top"
+    canvasContext.fillStyle = "#ffffff"
+    canvasContext.fillText(this.human, field.w / 4, 50)
+    canvasContext.fillText(this.computer, field.w / 2 + field.w / 4, 50)
+  },
+}
+
 // Raquete da esquerda
 const leftPaddle = {
   x: gapX,
@@ -50,8 +70,16 @@ const rightPaddle = {
   y: field.h / 2,
   w: line.w,
   h: 100,
+  speed: 5,
   _move: function () {
-    this.y = ball.y
+    if (this.y + this.h / 2 < ball.y + ball.r) {
+      this.y += this.speed
+    } else {
+      this.y -= this.speed
+    }
+  },
+  speedUp: function() {
+    this.speed++
   },
   draw: function () {
     // Desenho da raquete direita
@@ -76,18 +104,33 @@ const ball = {
     if (this.x > field.w - this.r - rightPaddle.w - gapX) {
       // Calcula a posição da raquete no eixo y
       if (
-        this.y + this.r > rightPaddle.y && 
+        this.y + this.r > rightPaddle.y &&
         this.y - this.r < rightPaddle.y + rightPaddle.h
-        ) {
+      ) {
         // Rebater a bola
         this._reverseX()
       } else {
         // Fazer ponto
+        score.increaseHuman()
+        this._pointUp()
       }
     }
 
     // Verifica se o jogador 2 (computador) fez um ponto
-    
+    if (this.x < this.r + leftPaddle.w + gapX) {
+      //Calcula a posição da raquete no eixo y
+      if (
+        this.y + this.r > leftPaddle.y &&
+        this.y - this.r < leftPaddle.y + leftPaddle.h
+      ) {
+        // Rebate a bola
+        this._reverseX()
+      } else {
+        // Fazer ponto
+        score.increaseComputer()
+        this._pointUp()
+      }
+    }
 
     // Calcula a posição vertical da bola (eixo Y)
     if (
@@ -102,6 +145,17 @@ const ball = {
   },
   _reverseY: function () {
     this.directionY *= -1
+  },
+  _speedUp: function () {
+    this.speed += 2
+  },
+  _pointUp: function () {
+    this.x = field.w / 2
+    this.y = field.h / 2
+
+    this._reverseX()
+    this._speedUp()
+    rightPaddle.speedUp()
   },
   _move: function () {
     // Movimento da Bola
@@ -134,6 +188,8 @@ function draw() {
   rightPaddle.draw() // Raquete direita
 
   ball.draw() // Desenho da bola
+
+  score.draw() // Pontuação
 }
 
 // Animação para tipos de navegadores
